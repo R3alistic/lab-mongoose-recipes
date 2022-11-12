@@ -14,31 +14,26 @@ const manageRecipes = async () => {
     // Connection to the database "recipe-app"
     const dbConnection = await mongoose.connect(MONGODB_URI);
     console.log(`Connected to the database: "${dbConnection.connection.name}"`);
-
     // Before adding any recipes to the database, let's remove all existing ones
     await Recipe.deleteMany();
-
     // Run your code here, after you have insured that the connection was made
+    const newRecipe = await Recipe.create({ title: 'New recipe Title', cuisine: 'new cuisine type' });
+    console.log("New recipe:", newRecipe.title);
+    const multipleRecipes = await Recipe.insertMany(data);
+    multipleRecipes.forEach(recipe => {
+      console.log('Title -->', recipe.title);
+    });
+    await Recipe.findOneAndUpdate(
+      { title: 'Rigatoni alla Genovese' },
+      { duration: 100 },
+      { new: true }
+    )
+    await Recipe.deleteOne({ title: 'Carrot Cake' });
   } catch (error) {
     console.log(error);
+  } finally {
+    await mongoose.connection.close();
   }
 };
 
 manageRecipes();
-
-//Method 2: Using .then() method
-//If you want to use this method uncomment the code below:
-
-/* mongoose
-  .connect(MONGODB_URI)
-  .then((x) => {
-    console.log(`Connected to the database: "${x.connection.name}"`);
-    // Before adding any recipes to the database, let's remove all existing ones
-    return Recipe.deleteMany();
-  })
-  .then(() => {
-    // Run your code here, after you have insured that the connection was made
-  })
-  .catch((error) => {
-    console.error('Error connecting to the database', error);
-  }); */
